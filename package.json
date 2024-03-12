@@ -5,7 +5,7 @@
   "scripts": {
     "start": "tsx src/server.ts",
     "start:dev": "tsx watch src/server.ts",
-    "vercel-build": "yarn prisma migrate deploy"
+    "vercel-build": "yarn prisma generate migrate deploy"
   },
   "license": "MIT",
   "devDependencies": {
