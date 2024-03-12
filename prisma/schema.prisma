@@ -1,0 +1,389 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Parent {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dialCode   String
+  number     String  @unique
+  name       String?
+  email      String? @unique
+  country    String
+  isVerified Boolean @default(false)
+
+  token       Token[]
+  children    ParentChild[]
+  appointment Appointment[]
+
+  @@map("parents")
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type        String // Number | API
+  numberToken String? @unique
+
+  valid      Boolean  @default(true)
+  expiration DateTime
+
+  parentId String
+  Parent   Parent @relation(fields: [parentId], references: [id])
+
+  @@map("tokens")
+}
+
+model Child {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  gender    String
+  date      String
+  height    Float
+  weight    Float
+  bloodType String
+
+  parents      ParentChild[]
+  medications  Medication[]
+  vaccinations Vaccination[]
+  feverRecords FeverRecord[]
+  illnesses    Illness[]
+  milestones   Milestone[]
+  appointment  Appointment[]
+  FoodPlan     FoodPlan[]
+
+  @@map("children")
+}
+
+model ParentChild {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  relationship String
+
+  childId  String?
+  child    Child?  @relation(fields: [childId], references: [id])
+  parentId String?
+  Parent   Parent? @relation(fields: [parentId], references: [id])
+  Avatar   Avatar? @relation(fields: [avatarId], references: [id])
+  avatarId String?
+
+  @@map("parent_child")
+}
+
+model Avatar {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  avatarUrl           String?
+  children_on_parents ParentChild[]
+
+  @@map("avatars")
+}
+
+model Medication {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name            String
+  dose            String
+  frequency       String
+  startDate       DateTime
+  endDate         DateTime?
+  reminders       Reminder[]
+  adverseEffects  AdverseEffect[]
+  medRecords      MedicationRecord[]
+  medInterruption MedicationInterruption[]
+
+  child   Child?  @relation(fields: [childId], references: [id])
+  childId String?
+
+  @@map("medications")
+}
+
+model Vaccination {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name               String
+  LotNumber          String
+  administrationDate DateTime
+  adverseEffects     AdverseEffect[]
+  Child              Child?          @relation(fields: [childId], references: [id])
+  childId            String?
+
+  @@map("vaccinations")
+}
+
+model FeverRecord {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  temperature Float
+  location    String
+  measuredAt  DateTime
+  symptoms    String[]
+  Child       Child?   @relation(fields: [childId], references: [id])
+  childId     String?
+
+  @@map("fever_records")
+}
+
+model Reminder {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  time         DateTime
+  status       String // Pendente | Feito | Para_outra_hora | Não_feito
+  Medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+
+  @@map("reminders")
+}
+
+enum Status {
+  Pendente
+  Feito
+  Para_outra_hora
+  Nao_feito
+}
+
+model AdverseEffect {
+  id            String       @id @default(uuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  Medication    Medication?  @relation(fields: [medicationId], references: [id])
+  medicationId  String?
+  Vaccination   Vaccination? @relation(fields: [vaccinationId], references: [id])
+  vaccinationId String?
+
+  @@map("adverse_effects")
+}
+
+model MedicationRecord {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  date         DateTime
+  dosage       String
+  Medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+
+  @@map("medication_records")
+}
+
+model MedicationInterruption {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  date         DateTime
+  reason       String
+  Medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+
+  @@map("medication_interruptions")
+}
+
+model FirstAid {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type        String
+  description String
+  actionTaken String
+
+  @@map("first_aid")
+}
+
+model Illness {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name      String
+  diagnosis String
+  startDate DateTime
+  endDate   DateTime?
+  Child     Child?    @relation(fields: [childId], references: [id])
+  childId   String?
+
+  @@map("illnesses")
+}
+
+model SpecialTips {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  condition String
+  tips      String
+
+  @@map("special_tips")
+}
+
+model Milestone {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String
+  age         String
+  achieved    Boolean?
+  achievedAt  DateTime?
+  childId     String
+  child       Child     @relation(fields: [childId], references: [id])
+
+  @@map("milestones")
+}
+
+model FoodPlan {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  date           DateTime // Data do plano alimentar
+  breakfast      String // Café da manhã
+  morningSnack   String // Lanche da manhã
+  lunch          String // Almoço
+  afternoonSnack String // Lanche da tarde
+  dinner         String // Jantar
+  eveningSnack   String // Lanche da noite
+  schoolSnack    String? // Lanche escolar (opcional)
+
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+  doctorId String
+
+  child   Child  @relation(fields: [childId], references: [id])
+  childId String
+
+  @@map("food_plans")
+}
+
+model Doctor {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name    String
+  email   String? @unique
+  phone   String? @unique
+  license String? @unique
+
+  specialties DoctorSpecialty[]
+  appointment Appointment[]
+  FoodPlan    FoodPlan[]
+
+  @@map("doctors")
+}
+
+model Specialty {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String @unique
+
+  doctors     DoctorSpecialty[]
+  appointment Appointment[]
+
+  @@map("specialties")
+}
+
+model DoctorSpecialty {
+  id          String     @id @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Doctor      Doctor?    @relation(fields: [doctorId], references: [id])
+  doctorId    String?
+  Specialty   Specialty? @relation(fields: [specialtyId], references: [id])
+  specialtyId String?
+
+  @@map("doctor_specialties")
+}
+
+model Service {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name         String        @unique
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model Appointment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dateTime DateTime
+  notes    String?
+
+  doctor   Doctor? @relation(fields: [doctorId], references: [id])
+  doctorId String?
+
+  parent   Parent? @relation(fields: [parentId], references: [id])
+  parentId String?
+
+  child   Child?  @relation(fields: [childId], references: [id])
+  childId String?
+
+  specialty   Specialty @relation(fields: [specialtyId], references: [id])
+  specialtyId String
+  Service     Service?  @relation(fields: [serviceId], references: [id])
+  serviceId   String?
+
+  @@map("appointments")
+}
+
+model Breastfeeding {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  advantage   String
+  description String
+  videos      String?
+  images      String?
+
+  @@map("breastfeedings")
+}
+
+model ApoloAuth {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refresh_token String
+
+  @@map("apoloauth")
+}
+
+enum Type {
+  NUMBER
+  API
+}
