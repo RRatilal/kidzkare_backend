@@ -5,24 +5,24 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
 interface SmsTokenProps {
-    dialCode: string;
-    number: string;
+    dialCode?: string;
+    number?: string;
     numberToken?: string;
 }
 
-export async function sendSmsToken({dialCode, number, numberToken}: SmsTokenProps) {
+export async function sendSmsToken({numberToken}: SmsTokenProps) {
      await client.messages.create({
         from: process.env.TWILIO_NUMBER,
-        to: `${dialCode + number}`,
+        to: `+258878724457`,
         body: `Your verification code is: ${numberToken}
                 #zlbI7U59p9z`
     })
 }
 
-export async function sendSmsNewUser({dialCode, number}: SmsTokenProps) {
-    await client.messages.create({
-        from: process.env.TWILIO_NUMBER,
-        to: `${dialCode + number}`,
-        body: `O seu número ${number}, foi adicionado como parente de uma criança`
-    })
-}
+// export async function sendSmsNewUser({dialCode, number}: SmsTokenProps) {
+//     await client.messages.create({
+//         from: process.env.TWILIO_NUMBER,
+//         to: `${dialCode + number}`,
+//         body: `O seu número ${number}, foi adicionado como parente de uma criança`
+//     })
+// }

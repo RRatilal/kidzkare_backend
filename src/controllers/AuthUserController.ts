@@ -45,10 +45,7 @@ export default {
                 }
             });
 
-            // send numberToken to user number
-            // if (dialCode + number === "+258829056991") {
-            //     sendSmsToken({dialCode, number, numberToken})
-            // }
+            sendSmsToken({numberToken})
     
             res.sendStatus(200);
         } catch (err) {

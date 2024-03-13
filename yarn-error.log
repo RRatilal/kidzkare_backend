@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js install
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add nodemailer
 
 PATH: 
   C:\Program Files (x86)\VMware\VMware Player\bin\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\compiler;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\lib\Elixir/bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ffmpeg\bin;C:\Program Files (x86)\dotnet\;C:\maven\bin;C:\Program Files\nodejs\;C:\Program Files\Docker\Docker\resources\bin;C:\Users\Rachi\AppData\Local\Microsoft\WindowsApps;C:\Users\Rachi\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Rachi\AppData\Local\Yarn\bin;C:\Users\Rachi\AppData\Local\nvs\;%JAVA_HOME%\bin;C:\Users\Rachi\AppData\Roaming\npm
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: ENOENT: no such file or directory, copyfile 'C:\Users\Rachi\AppData\Local\Yarn\Cache\v6\npm-prisma-5.7.1-af60ed90531adc0ab8a683c9b1fc86d841c39864-integrity\node_modules\prisma\build\index.js' -> 'R:\Bware\KidzKare\app\Final\Backend\node_modules\prisma\build\index.js'
+  Error: EPERM: operation not permitted, unlink 'R:\Bware\KidzKare\app\Final\Backend\node_modules\prisma\engines\0ca5ccbcfa6bdc81c003cf549abe4269f59c41e5\query_engine-windows.dll.node'
 
 npm manifest: 
   {
@@ -23,7 +23,8 @@ npm manifest:
     "main": "index.js",
     "scripts": {
       "start": "tsx src/server.ts",
-      "start:dev": "tsx watch src/server.ts"
+      "start:dev": "tsx watch src/server.ts",
+      "vercel-build": "yarn prisma generate migrate deploy"
     },
     "license": "MIT",
     "devDependencies": {
