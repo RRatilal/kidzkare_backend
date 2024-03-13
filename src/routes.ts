@@ -33,6 +33,6 @@ router.post("/milestones", MilestoneController.create)
 router.get("/milestones", MilestoneController.milestone)
 
 router.post("/apoloapi", ApoloController.apolo)
-router.post("/apoloapitoken", ApoloController.token)
+router.post("/apoloapi_access_token", ApoloController.token)
 
 export { router };
