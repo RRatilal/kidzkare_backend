@@ -23,6 +23,8 @@ export default {
     async create(req: Request, res: Response) {
         const { number, dialCode, country } = req.body;
 
+        console.log(req.body)
+
         // generate token
         const numberToken = generateNumberToken();
 

@@ -19,13 +19,19 @@ router.use(ensureAutheticated)
 
 router.get("/user", AuthUserController.user)
 router.put("/update", AuthUserController.update)
+
 router.post("/create-child", ChildController.create)
 router.get("/getchildren", ChildController.getChildren)
+
 router.post("/createfoodplans", FoodPlanController.create)
 router.get("/getfoodplans", FoodPlanController.getFoodPan)
+
 router.post("/breastfeeding", BreastfeedingController.create)
 router.get("/breastfeeding", BreastfeedingController.getFoodPan)
+
+router.post("/milestones", MilestoneController.create)
 router.get("/milestones", MilestoneController.milestone)
+
 router.post("/apoloapi", ApoloController.apolo)
 router.post("/apoloapitoken", ApoloController.token)
 
