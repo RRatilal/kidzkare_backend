@@ -11,7 +11,7 @@ export default {
                     description,
                     age,
                     achieved,
-                    achievedAt,
+                    achievedAt: new Date(achievedAt),
                     childId,
                 }
             })
