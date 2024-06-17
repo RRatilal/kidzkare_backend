@@ -9,6 +9,7 @@ import FoodPlanController from "./controllers/FoodPlanController";
 import BreastfeedingController from "./controllers/BreastfeedingController";
 import MilestoneController from "./controllers/MilestoneController";
 import ApoloController from "./controllers/ApoloController";
+// import SyncController from "./controllers/SyncController";
 
 const router = Router();
 
@@ -17,11 +18,14 @@ router.post("/auth", AuthUserController.auth)
 
 router.use(ensureAutheticated)
 
+// router.get("/sync", SyncController.pull)
+// router.post("/sync", SyncController.push)
+
 router.get("/user", AuthUserController.user)
 router.put("/update", AuthUserController.update)
 
-router.post("/create-child", ChildController.create)
-router.get("/getchildren", ChildController.getChildren)
+router.post("/children", ChildController.create)
+router.get("/children", ChildController.getChildren)
 
 router.post("/createfoodplans", FoodPlanController.create)
 router.get("/getfoodplans", FoodPlanController.getFoodPan)
@@ -33,6 +37,6 @@ router.post("/milestones", MilestoneController.create)
 router.get("/milestones", MilestoneController.milestone)
 
 router.post("/apoloapi", ApoloController.apolo)
-router.post("/apoloapi_access_token", ApoloController.token)
+router.get("/apoloapi_access_token", ApoloController.token)
 
 export { router };

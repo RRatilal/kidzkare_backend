@@ -4,10 +4,6 @@ import querystring from 'querystring';
 import { prismaClient } from "../prisma";
 
 
-
-
-
-
 export default {
     async apolo(req: Request, res: Response) {
         const formData = {
@@ -27,15 +23,17 @@ export default {
             }
             })
 
-            const refresh_token = await prismaClient.apoloAuth.findFirst()
+            console.log("result",result.data.access_token)
 
-            if (!refresh_token) {
-                await prismaClient.apoloAuth.create({
-                    data: {
-                        refresh_token: result.data.refresh_token
-                    }
-                })
-            }
+            // const refresh_token = await prismaClient.apoloAuth.findFirst()
+
+            // if (!refresh_token) {
+                // await prismaClient.apoloAuth.create({
+                //     data: {
+                //         refresh_token: result.data.refresh_token
+                //     }
+                // })
+            // }
 
             const access_token = result.data.access_token
 
@@ -49,6 +47,8 @@ export default {
     async token(req: Request, res: Response) {
         try {
             const refresh_token = await prismaClient.apoloAuth.findFirst();
+
+            console.log(refresh_token)
             const accessTokenData = {
                 grant_type: process.env.APOLO_GRANT_TYPE_REFRESH,
                 refresh_token: refresh_token?.refresh_token,
