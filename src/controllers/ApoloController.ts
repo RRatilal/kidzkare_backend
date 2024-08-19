@@ -7,7 +7,7 @@ import { prismaClient } from "../prisma";
 export default {
     async apolo(req: Request, res: Response) {
         const formData = {
-            grant_type: process.env.APOLO_GRANT_TYPE,
+            grant_type: process.env.APOLO_GRANT_TYPE, 
             account: process.env.APOLO_ACCOUNT,
             username: process.env.APOLO_USERNAME,
             password: process.env.APOLO_PASSWORD,

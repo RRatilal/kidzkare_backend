@@ -12,12 +12,13 @@ model Parent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  dialCode   String
-  number     String  @unique
-  name       String?
-  email      String? @unique
-  country    String
-  isVerified Boolean @default(false)
+  dialCode    String
+  number      String  @unique
+  name        String?
+  email       String? @unique
+  country     String
+  dateOfBirth String?
+  isVerified  Boolean @default(false)
 
   token       Token[]
   children    ParentChild[]
