@@ -89,55 +89,46 @@ export default {
     },
 
     async getChildren(req: Request, res: Response) {
-        const lastPulledAt = getSafeLastPulledAt(req);
-        
-        const { userId } = req;
-        const created = await prismaClient.child.findMany({
-            where: { 
-                createdAt: { gt: lastPulledAt },
-                parents: {
-                    some: { parentId: userId }
+        try {
+            const lastPulledAt = getSafeLastPulledAt(req);
+            const { userId } = req;
+    
+            const created = await prismaClient.child.findMany({
+                where: { 
+                    createdAt: { gt: lastPulledAt },
+                    parents: {
+                        some: { parentId: userId }
+                    }
                 }
+            });
+    
+            const updated = await prismaClient.child.findMany({
+                where: { 
+                    AND: [{ updatedAt: { gt: lastPulledAt } }, { createdAt: { lte: lastPulledAt } }],
+                    parents: {
+                        some: { parentId: userId }
+                    }
+                }
+            });
+    
+            const returnObject = {
+                changes: {
+                    children: {
+                        created,
+                        updated,
+                        deleted: [],
+                    }
+                },
+                timestamp: Date.now(),
             }
-        });
-        const updated = await prismaClient.child.findMany({
-            where: { 
-                AND: [{ updatedAt: { gt: lastPulledAt } }, { createdAt: { lte: lastPulledAt } }],
-                parents: {
-                    some: { parentId: userId }
-                }
-            }
-        });
-
-        const returnObject = {
-            changes: {
-                children: {
-                    created,
-                    updated,
-                    deleted: [],
-                }
-            },
-            timestamp: Date.now(),
+    
+            // Envia a resposta e garante que nenhuma outra lógica será executada após
+            return res.json(returnObject);
+        } catch (error) {
+            // Em caso de erro, responde com status 500 e encerra a execução
+            console.error(error);
+            return res.status(500).json({ error: "Erro ao buscar crianças" });
         }
-
-        // const children = await prismaClient.child.findMany({
-        //     where: {
-        //         parents: {
-        //             some: {
-        //                 parentId: userId,
-        //             }
-        //         }
-        //     },
-        //     include: {
-        //         parents: {
-        //             select: {
-        //                 relationship: true,
-        //                 Parent: true
-        //             }
-        //         }
-        //     }
-        // })
-
-        res.json(returnObject)
     }
+    
 }

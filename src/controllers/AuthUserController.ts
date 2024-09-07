@@ -1,22 +1,14 @@
 import { Request, Response } from "express";
 import { prismaClient } from "../prisma";
-import jwt from "jsonwebtoken";
+
 import { sendSmsToken } from "../services/smsServices";
+import { generateAuthToken } from "../services/generateAuthTokenServices";
+import { generateRefreshToken } from "../services/generateRefreshTokenService";
 
 const numberTokenExpirationMinutes = 10;
-const authTokenExpirationHours = 240;
 
 function generateNumberToken(): string {
     return Math.floor(1000 + Math.random() * 9000).toString()
-}
-
-function generateAuthToken(tokenId: string): string {
-    const jwtPayload = { tokenId };
-
-    return jwt.sign(jwtPayload, process.env.JWT_SECRET!, {
-        algorithm: "HS256",
-        noTimestamp: true
-    })
 }
 
 export default {
@@ -45,7 +37,7 @@ export default {
                 }
             });
 
-            sendSmsToken({numberToken})
+            // sendSmsToken({numberToken})
     
             res.sendStatus(200);
         } catch (err) {
@@ -78,30 +70,19 @@ export default {
             return res.sendStatus(401);
         }
 
-        const expiration = new Date(new Date().getTime() +  authTokenExpirationHours * 60 * 60 * 1000);
+        // generate the authentication token
+        const authToken = generateAuthToken(dbNumberToken.parentId)
 
-        const apiToken = await prismaClient.token.create({
-            data: {
-                type: "API",
-                expiration,
-                Parent: {
-                    connect: { number }
-                }
-            }
-        })
+        // generate the refresh token
+        const refreshToken = await generateRefreshToken(dbNumberToken.parentId)
 
-        // Invalidate the email
+        // Invalidate the number token
         await prismaClient.token.update({
             where: { id: dbNumberToken.id },
             data: { valid: false }
         })
 
-        // generate the JWT token
-        const authToken = generateAuthToken(apiToken.id)
-
-        // const userId = apiToken.userId;
-
-        res.json({ authToken });
+        res.json({ authToken, refreshToken });
     },
 
     async user(req: Request, res: Response) {

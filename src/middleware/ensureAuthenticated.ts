@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { prismaClient } from "../prisma";
+import { verify } from "jsonwebtoken";
 
 interface IPayload {
     tokenId: string;
 }
 
-export async function ensureAutheticated(req: Request, res: Response, next: NextFunction) {
+export async function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
     const authToken = req.headers.authorization;
     
     if (!authToken) {
@@ -19,25 +18,15 @@ export async function ensureAutheticated(req: Request, res: Response, next: Next
 
 
     try {
-        const { tokenId } = jwt.verify(token, process.env.JWT_SECRET! ) as IPayload;
+        const { tokenId } = verify(token, process.env.JWT_SECRET! ) as IPayload
 
-        const apiToken = await prismaClient.token.findUnique({
-            where: { id: tokenId }
-        });
-
-        if (!apiToken || apiToken.expiration < new Date() || !apiToken.valid) {
-            res.status(401).json({
-                errorCode: "token expired"
-            })
-        }
-
-        req.userId = apiToken?.parentId as string;
+        req.userId = tokenId;
         
         return next();
     } catch (error) {
         console.log(error)
-        res.status(401).json({
-            errorCode: "token expired"
+        return res.status(401).json({
+            errorCode: "Token invalid"
         })
     }
 }
