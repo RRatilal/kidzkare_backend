@@ -56,11 +56,15 @@ export default {
 
     async token(req: Request, res: Response) {
         try {
-            const refresh_token = await prismaClient.apoloAuth.findFirst();
+            const refreshTokenRecord  = await prismaClient.apoloAuth.findFirst();
+
+            if (!refreshTokenRecord ?.refresh_token) {
+                return res.status(404).json({ error: "Refresh token não encontrado" });
+            }
 
             const accessTokenData = {
                 grant_type: process.env.APOLO_GRANT_TYPE_REFRESH,
-                refresh_token: refresh_token?.refresh_token,
+                refresh_token: refreshTokenRecord ?.refresh_token,
             }
 
             const body = querystring.stringify(accessTokenData);
@@ -74,8 +78,7 @@ export default {
 
             
             
-            if (result && result.data) {
-                console.log("mobile", result.data)
+            if (result?.data) {
                 const access_token = result.data.access_token;
                 return res.json({ access_token });
             } else {

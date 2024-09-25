@@ -61,9 +61,9 @@ model Child {
   vaccinations Vaccination[]
   feverRecords FeverRecord[]
   illnesses    Illness[]
-  milestones   Milestone[]
   appointment  Appointment[]
-  FoodPlan     FoodPlan[]
+  foodPlan     FoodPlan[]
+  completedBy  CompletedBy[]
 
   @@map("children")
 }
@@ -250,13 +250,35 @@ model Milestone {
 
   title       String
   description String
-  age         String
-  achieved    Boolean?
-  achievedAt  DateTime?
-  childId     String
-  child       Child     @relation(fields: [childId], references: [id])
+  ageRange    String
+  categoryId  String
+  category    MilestoneCategory @relation(fields: [categoryId], references: [id])
+
+  completedBy CompletedBy[]
 
   @@map("milestones")
+}
+
+model CompletedBy {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  childId     String?
+  child       Child?     @relation(fields: [childId], references: [id])
+  milestoneId String?
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+
+  @@map("completed_by")
+}
+
+model MilestoneCategory {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name       String
+  milestones Milestone[]
 }
 
 model FoodPlan {

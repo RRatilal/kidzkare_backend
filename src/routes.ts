@@ -27,7 +27,7 @@ router.get("/user", AuthUserController.user)
 router.put("/update", AuthUserController.update)
 
 router.post("/children", ChildController.create)
-router.get("/children", ChildController.getChildren)
+router.get("/children", ChildController.read)
 
 router.post("/createfoodplans", FoodPlanController.create)
 router.get("/getfoodplans", FoodPlanController.getFoodPan)
@@ -36,7 +36,8 @@ router.post("/breastfeeding", BreastfeedingController.create)
 router.get("/breastfeeding", BreastfeedingController.getFoodPan)
 
 router.post("/milestones", MilestoneController.create)
-router.get("/milestones", MilestoneController.milestone)
+router.get("/milestones", MilestoneController.read)
+router.post("/completed_by/:id", MilestoneController.completedBy)
 
 router.post("/apoloapi", ApoloController.apolo)
 router.post("/apoloapi_access_token", ApoloController.token)
