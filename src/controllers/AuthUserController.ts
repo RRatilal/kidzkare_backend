@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prismaClient } from "../prisma";
 
-import { sendSmsToken } from "../services/smsServices";
+import { sendOtp } from "../services/otpServices";
 import { generateAuthToken } from "../services/generateAuthTokenServices";
 import { generateRefreshToken } from "../services/generateRefreshTokenService";
 
@@ -37,7 +37,7 @@ export default {
                 }
             });
 
-            // sendSmsToken({numberToken})
+            await sendOtp({ numberToken, number, dialCode });
     
             res.sendStatus(200);
         } catch (err) {
@@ -87,6 +87,7 @@ export default {
 
     async user(req: Request, res: Response) {
         const { userId } = req;
+        console.log(userId)
 
         try {
             const user = await prismaClient.parent.findUnique({

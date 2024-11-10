@@ -8,9 +8,10 @@ datasource db {
 }
 
 model Parent {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  watermelon_id String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   dialCode    String
   number      String  @unique
@@ -19,6 +20,9 @@ model Parent {
   country     String
   dateOfBirth String?
   isVerified  Boolean @default(false)
+
+  avatarId String?
+  avatar   Avatar? @relation(fields: [avatarId], references: [id])
 
   token       Token[]
   children    ParentChild[]
@@ -45,9 +49,10 @@ model Token {
 }
 
 model Child {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  watermelon_id String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   name      String
   gender    String
@@ -55,6 +60,9 @@ model Child {
   height    Float
   weight    Float
   bloodType String
+
+  avatarId String?
+  avatar   Avatar? @relation(fields: [avatarId], references: [id])
 
   parents      ParentChild[]
   medications  Medication[]
@@ -79,8 +87,6 @@ model ParentChild {
   child    Child?  @relation(fields: [childId], references: [id])
   parentId String?
   Parent   Parent? @relation(fields: [parentId], references: [id])
-  Avatar   Avatar? @relation(fields: [avatarId], references: [id])
-  avatarId String?
 
   @@map("parent_child")
 }
@@ -90,8 +96,11 @@ model Avatar {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  avatarUrl           String?
-  children_on_parents ParentChild[]
+  avatarUrl   String?
+  driveFileId String?
+
+  child  Child[]
+  parent Parent[]
 
   @@map("avatars")
 }
@@ -264,10 +273,11 @@ model CompletedBy {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  childId     String?
-  child       Child?     @relation(fields: [childId], references: [id])
-  milestoneId String?
-  milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  completionDate DateTime?
+  childId        String?
+  child          Child?     @relation(fields: [childId], references: [id])
+  milestoneId    String?
+  milestone      Milestone? @relation(fields: [milestoneId], references: [id])
 
   @@map("completed_by")
 }
@@ -404,6 +414,19 @@ model ApoloAuth {
   refresh_token String
 
   @@map("apoloauth")
+}
+
+model Changes {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tableName  String
+  changeType String
+  recordId   String
+  data       Json?
+
+  @@map("changes")
 }
 
 enum Type {

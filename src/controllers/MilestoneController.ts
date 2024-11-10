@@ -99,7 +99,7 @@ export default {
             }
 
             const completedBy = await prismaClient.completedBy.create({ 
-                data: { childId, milestoneId: id } 
+                data: { childId, milestoneId: id, completionDate: new Date() } 
             })
 
             res.json({ completedBy })

@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { prismaClient } from "../prisma";
+import { uploadToDrive } from "../config/multer";
 // import { sendSmsNewUser } from "../services/smsServices";
 
 const getSafeLastPulledAt = (request: Request) => {
@@ -11,9 +12,7 @@ const getSafeLastPulledAt = (request: Request) => {
   };
 
 export default {
-    async create(req: Request, res: Response) {
-        const lastPulledAt = getSafeLastPulledAt(req);
-        console.log(lastPulledAt, req.query.last_pulled_at);
+    async create(req: Request, res: Response, next: NextFunction) {
 
         const { name, gender, date, height, weight, parents } = req.body;
 
@@ -29,8 +28,10 @@ export default {
                 }
             })
 
+            const parsedParents = JSON.parse(parents);
+
             await Promise.all(
-                parents.map(async(item: any) => {
+                parsedParents.map(async(item: any) => {
                     const existingParent = await prismaClient.parent.findUnique({
                         where: { number: item.parentPhone },
                     })
@@ -62,31 +63,28 @@ export default {
                 })
             );
 
+            const { driveFileId } = await uploadToDrive(req, res, next);
+
+            if (driveFileId) {
+                await prismaClient.avatar.create({
+                    data: {
+                        child: {
+                            connect: {
+                                id: child.id
+                            }
+                        },
+                        driveFileId
+                    }
+                })
+            }
+
             res.json({child})
         } catch (err) {
             console.log(err)
             res.status(400).json({ error: "Não foi possível criar a criança" });
         }
     },
-
-    // async create(req: Request, res: Response) {
-    //     console.log("create");
-    //     const { changes } = req.body;
-    //     if (!changes) {
-    //         return res.status(400).json({ error: "Dados incorrectos" })
-    //     }
-        
-    //     const lastPulledAt = getSafeLastPulledAt(req);
-    //     console.log(lastPulledAt, req.query.last_pulled_at);
-    //     console.log("changes", changes);
-
-    //     try {
-            
-    //     } catch (err) {
-    //         console.log(err)
-    //         res.status(400).json({ error: "Não foi possível criar a criança" });
-    //     }
-    // },
+    
 
     async read(req: Request, res: Response) {
         try {

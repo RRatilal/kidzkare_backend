@@ -1,7 +1,8 @@
 import { Router } from "express";
 
 import { ensureAuthenticated } from "./middleware/ensureAuthenticated";
-import uploadConfig from "./config/multer"
+
+import { upload } from "./config/multer";
 
 import AuthUserController from "./controllers/AuthUserController";
 import ChildController from "./controllers/ChildController";
@@ -10,7 +11,7 @@ import BreastfeedingController from "./controllers/BreastfeedingController";
 import MilestoneController from "./controllers/MilestoneController";
 import ApoloController from "./controllers/ApoloController";
 import RefreshTokenController from "./controllers/RefreshTokenController";
-// import SyncController from "./controllers/SyncController";
+import SyncController from "./controllers/SyncController";
 
 const router = Router();
 
@@ -20,13 +21,13 @@ router.post("/refresh-token", RefreshTokenController.refreshToken)
 
 router.use(ensureAuthenticated)
 
-// router.get("/sync", SyncController.pull)
-// router.post("/sync", SyncController.push)
+router.get("/sync", SyncController.pull)
+router.post("/sync", SyncController.push)
 
 router.get("/user", AuthUserController.user)
 router.put("/update", AuthUserController.update)
 
-router.post("/children", ChildController.create)
+router.post("/children", upload.single("file"), ChildController.create)
 router.get("/children", ChildController.read)
 
 router.post("/createfoodplans", FoodPlanController.create)
